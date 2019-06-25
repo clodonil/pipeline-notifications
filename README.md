@@ -76,3 +76,7 @@ Resources:
       - Endpoint:
           Ref: EmailAddress
 Protocol: email
+
+
+# Referencia
+[SnStoSlack](https://medium.com/cohealo-engineering/how-set-up-a-slack-channel-to-be-an-aws-sns-subscriber-63b4d57ad3ea)
