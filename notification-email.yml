@@ -36,19 +36,6 @@ Resources:
               state: "$.detail.state" 
               stage: "$.detail.stage"
 
-        - 
-          Arn: 
-            Ref: "PipelineLambda"
-          Id: "PipelineNotificationTopic"
-          InputTransformer:
-            InputTemplate: '"A Pipeline <pipeline> finalizou o Stage <stage> com o status <state>. Mais detalhes, acesse https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/<pipeline>"'
-            InputPathsMap:
-              pipeline: "$.detail.pipeline"
-              state: "$.detail.state" 
-              stage: "$.detail.stage"
-
-              
-
 
   PipelineSNSTopic:
     Type: AWS::SNS::Topic

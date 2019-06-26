@@ -1,0 +1,10 @@
+---
+Description: CodePipeline notifications.
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  EventBusPolicyCodeMetrics: 
+      Type: AWS::Events::EventBusPolicy
+      Properties: 
+          Action: "events:PutEvents"
+          Principal: "970374634735"
+          StatementId: "PipelineON"

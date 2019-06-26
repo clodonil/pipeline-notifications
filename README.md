@@ -80,3 +80,5 @@ Protocol: email
 
 # Referencia
 [SnStoSlack](https://medium.com/cohealo-engineering/how-set-up-a-slack-channel-to-be-an-aws-sns-subscriber-63b4d57ad3ea)
+[35.pdf](https://d1.awsstatic.com/events/jp/2018/summit/tokyo/aws/35.pdf)
+[Exemplos](https://github.com/awsdocs/aws-cloudformation-user-guide/tree/master/doc_source)
