@@ -1,0 +1,85 @@
+---
+Description: CodePipeline notifications.
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Webhook:
+    Description: WebHook para do canal para envio do FeedBack
+    Type: String
+
+Resources:
+  EventRuleChatOps: 
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: Pipeline-Feedback-ChatOps 
+      Description: "EventRule"
+      EventPattern: 
+        source:
+        - aws.codepipeline
+        detail-type:
+        - CodePipeline Stage Execution State Change
+        detail:
+          state:
+          - STARTED
+          - FAILED
+          - CANCELED
+          - RESUMED
+          - SUCCEEDED
+      State: "ENABLED"
+      Targets: 
+      - 
+        Arn: 
+          Fn::GetAtt: 
+            - "LambdaFunction"
+            - "Arn"
+        Id: "TargetFunctionV1"
+        
+  PermissionForEventsToInvokeLambdaChatOps: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: "LambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: 
+        Fn::GetAtt: 
+          - "EventRuleChatOps"
+          - "Arn"
+     
+  LambdaExecutionRoleChatOps:
+       Type: AWS::IAM::Role
+       Properties:
+         AssumeRolePolicyDocument:
+           Version: '2012-10-17'
+           Statement:
+           - Effect: Allow
+             Principal:
+               Service:
+               - lambda.amazonaws.com
+             Action:
+             - sts:AssumeRole
+         Path: "/"
+         Policies:
+         - PolicyName: LambdaExecutionRoleChatOps
+           PolicyDocument:
+             Version: '2012-10-17'
+             Statement:
+             - Effect: Allow
+               Action:
+               - logs:*
+               Resource: arn:aws:logs:*:*:*
+   
+
+  LambdaFunction:
+      Type: "AWS::Lambda::Function"
+      Properties:
+        Description: Lambda para feedback do ChatOps
+        Code:
+          ZipFile: |
+            from __future__ import print_function
+            def lambda_handler(event, context):
+              print(event)
+              return event
+        Handler: index.lambda_handler
+        MemorySize: 128
+        Role: !GetAtt [ LambdaExecutionRoleChatOps, Arn ]
+        Runtime: python3.6  

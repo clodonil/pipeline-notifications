@@ -1,0 +1,72 @@
+---
+Description: CodePipeline notifications.
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  EmailAddress:
+    Description: Lista de distribuição para notificação da Pipeline
+    Type: String
+Resources:
+
+  EventRuleStages: 
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: Pipeline-notification-stages 
+      Description: "EventRule"
+      EventPattern: 
+        source:
+        - aws.codepipeline
+        detail-type:
+        - CodePipeline Stage Execution State Change
+        detail:
+          state:
+          - FAILED
+          - CANCELED
+          - RESUMED
+          - SUCCEEDED
+      State: "ENABLED"
+      Targets: 
+        - 
+          Arn: 
+            Ref: "PipelineSNSTopic"
+          Id: "PipelineNotificationTopic"
+          InputTransformer:
+            InputTemplate: '"A Pipeline <pipeline> finalizou o Stage <stage> com o status <state>. Mais detalhes, acesse https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/<pipeline>"'
+            InputPathsMap:
+              pipeline: "$.detail.pipeline"
+              state: "$.detail.state" 
+              stage: "$.detail.stage"
+
+        - 
+          Arn: 
+            Ref: "PipelineLambda"
+          Id: "PipelineNotificationTopic"
+          InputTransformer:
+            InputTemplate: '"A Pipeline <pipeline> finalizou o Stage <stage> com o status <state>. Mais detalhes, acesse https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/<pipeline>"'
+            InputPathsMap:
+              pipeline: "$.detail.pipeline"
+              state: "$.detail.state" 
+              stage: "$.detail.stage"
+
+              
+
+
+  PipelineSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Endpoint:
+          Ref: EmailAddress
+        Protocol: email
+
+  EventTopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: 'sns:Publish'
+            Resource: '*'
+      Topics:
+        - !Ref "PipelineSNSTopic"
