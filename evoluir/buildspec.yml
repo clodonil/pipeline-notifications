@@ -1,0 +1,22 @@
+version: 0.2 
+phases: 
+  pre_build: 
+     commands: 
+        - echo Logging in to Amazon ECR... 
+        - $(aws ecr get-login --no-include-email --region us-east-1) 
+  build: 
+     commands: 
+        - echo Build started on `date` 
+        - echo Building the Docker image... 
+        - docker pull $REPOSITORY_SOURCE:latest 
+        - docker tag $REPOSITORY_SOURCE:latest $REPOSITORY_DEST:latest 
+  post_build: 
+     commands: 
+        - echo Pushing the Docker images... 
+        - docker push $REPOSITORY_DEST:latest 
+        - printf '[{"name":"app","imageUri":"%s"}]' $$REPOSITORY_DEST:latest > build.json 
+        - cat build.json 
+artifacts: 
+     files: 
+        - build.json 
+     discard-paths: yes 
