@@ -777,7 +777,7 @@ Resources:
               Configuration:
                 ClusterName: !Ref Cluster
                 ServiceName: !Ref Service
-                FileName: images.json
+                FileName: build.json
               InputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1 
